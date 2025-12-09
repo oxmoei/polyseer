@@ -161,6 +161,8 @@ export async function buildAuthorizationUrl(redirectUri: string): Promise<{
     state,
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
+    // UTM param for analytics - identifies which app users signed in from
+    utm_source: 'polyseer',
   });
 
   const url = `${VALYU_SUPABASE_URL}/auth/v1/oauth/authorize?${params.toString()}`;
