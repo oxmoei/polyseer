@@ -1,9 +1,6 @@
 import { generateObject } from 'ai';
 import { z } from 'zod';
-import { openai } from '@ai-sdk/openai';
-
-// Model helper
-const getModel = () => openai('gpt-4o');
+import { getModel } from '@/lib/ai/model';
 
 export const PlanSchema = z.object({
   subclaims: z.array(z.string().min(5)).min(2).max(10).describe('Causal factors and pathways that could lead to the outcome'),
@@ -24,7 +21,8 @@ export async function planAgent(question: string): Promise<Plan> {
   const { object } = await generateObject({
     model: getModel(),
     schema: PlanSchema,
-    system: `You are the Planner. Break the forecasting question into causal pathways and research directions. Focus on WHAT COULD CAUSE the outcome, not what the final state looks like.`,
+    mode: 'json',
+    system: `You are the Planner. Break the forecasting question into causal pathways and research directions. Focus on WHAT COULD CAUSE the outcome, not what the final state looks like. Always respond with valid JSON matching the required schema.`,
     prompt: `Question: ${question}
 
 CRITICAL: This is a PREDICTION question, not a fact-checking question. Focus on causal factors and pathways to the outcome.

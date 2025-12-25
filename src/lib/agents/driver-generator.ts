@@ -1,13 +1,10 @@
 import { generateObject } from 'ai';
-import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
-
-// Model helper
-const getModelSmall = () => openai('gpt-4o-mini');
+import { getModelSmall } from '@/lib/ai/model';
 
 const DriversSchema = z.object({
-  drivers: z.array(z.string()).min(3).max(5).describe('Key factors that could influence the outcome (3-8 concise factors)'),
-  reasoning: z.string().describe('Brief explanation of why these drivers were selected')
+  drivers: z.array(z.string()).min(3).max(5).describe('可能影响结果的关键因素（3-8个简洁因素，用中文）'),
+  reasoning: z.string().describe('选择这些驱动因素的简要说明')
 });
 
 interface MarketData {
@@ -27,24 +24,25 @@ export async function generateDrivers(marketData: MarketData): Promise<string[]>
     const result = await generateObject({
       model: getModelSmall(),
       schema: DriversSchema,
-      system: 'You are an expert analyst. Identify the key factors that would most likely influence the outcome of this prediction market.',
-      prompt: `Analyze this prediction market and identify 3-5 key drivers that could influence the outcome:
+      mode: 'json',
+      system: '你是一位专业分析师。识别最可能影响这个预测市场结果的关键因素。请用中文回答，并返回有效的 JSON。',
+      prompt: `分析这个预测市场并识别 3-5 个可能影响结果的关键驱动因素：
 
-Question: ${marketData.market_facts.question}
-Current market price: ${marketData.market_state_now[0]?.mid ? (marketData.market_state_now[0].mid * 100).toFixed(1) + '%' : 'N/A'}
-Volume: $${marketData.market_facts.volume?.toLocaleString() || 'N/A'}
-Liquidity: $${marketData.market_facts.liquidity?.toLocaleString() || 'N/A'}
+问题: ${marketData.market_facts.question}
+当前市场价格: ${marketData.market_state_now[0]?.mid ? (marketData.market_state_now[0].mid * 100).toFixed(1) + '%' : '无'}
+交易量: $${marketData.market_facts.volume?.toLocaleString() || '无'}
+流动性: $${marketData.market_facts.liquidity?.toLocaleString() || '无'}
 
-Consider factors like:
-- Economic indicators
-- Political developments  
-- Technological progress
-- Regulatory changes
-- Social trends
-- Historical precedents
-- Market sentiment drivers
+请考虑以下因素：
+- 经济指标
+- 政治发展
+- 技术进步
+- 监管变化
+- 社会趋势
+- 历史先例
+- 市场情绪驱动因素
 
-Return the most important factors that could move this market.`,
+请用中文返回最可能影响这个市场的重要因素。`,
     });
 
     console.log(`🎯 Auto-generated drivers: ${result.object.drivers.join(', ')}`);
@@ -60,16 +58,16 @@ Return the most important factors that could move this market.`,
 
 export function generateFallbackDrivers(question: string): string[] {
   const questionLower = question.toLowerCase();
-  
-  if (questionLower.includes('election') || questionLower.includes('political')) {
-    return ['Polling data', 'Economic conditions', 'Campaign events', 'Voter turnout'];
-  } else if (questionLower.includes('bitcoin') || questionLower.includes('crypto')) {
-    return ['Regulatory environment', 'Institutional adoption', 'Market sentiment', 'Technical developments'];
-  } else if (questionLower.includes('ai') || questionLower.includes('technology')) {
-    return ['Research breakthroughs', 'Compute scaling', 'Regulatory framework', 'Investment funding'];
-  } else if (questionLower.includes('climate') || questionLower.includes('environment')) {
-    return ['Policy changes', 'Technology adoption', 'Economic incentives', 'International cooperation'];
+
+  if (questionLower.includes('election') || questionLower.includes('political') || questionLower.includes('选举') || questionLower.includes('政治')) {
+    return ['民调数据', '经济状况', '竞选活动', '投票率'];
+  } else if (questionLower.includes('bitcoin') || questionLower.includes('crypto') || questionLower.includes('比特币') || questionLower.includes('加密')) {
+    return ['监管环境', '机构采用', '市场情绪', '技术发展'];
+  } else if (questionLower.includes('ai') || questionLower.includes('technology') || questionLower.includes('人工智能') || questionLower.includes('技术')) {
+    return ['研究突破', '算力扩展', '监管框架', '投资资金'];
+  } else if (questionLower.includes('climate') || questionLower.includes('environment') || questionLower.includes('气候') || questionLower.includes('环境')) {
+    return ['政策变化', '技术采用', '经济激励', '国际合作'];
   } else {
-    return ['Market conditions', 'Regulatory environment', 'Public sentiment', 'Economic factors'];
+    return ['市场状况', '监管环境', '公众情绪', '经济因素'];
   }
 }

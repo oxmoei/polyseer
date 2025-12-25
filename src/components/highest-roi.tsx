@@ -136,15 +136,15 @@ function MarketCard({ market, onAnalyze }: MarketCardProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <div className="text-white/60">
-              <span>Volume: </span>
+              <span>交易量: </span>
               <span className="text-white/80 font-medium">{formatVolume(market.volume)}</span>
             </div>
             {odds && (
               <div className="text-white/60">
-                <span>YES: </span>
+                <span>是: </span>
                 <span className="text-white/80 font-medium">{odds.yes}%</span>
                 <span className="text-white/40 mx-1">|</span>
-                <span>NO: </span>
+                <span>否: </span>
                 <span className="text-white/80 font-medium">{odds.no}%</span>
               </div>
             )}
@@ -234,10 +234,10 @@ export default function HighestROI({ onAnalyze }: HighestROIProps) {
               className="text-xl font-semibold text-white font-[family-name:var(--font-space)] flex items-center gap-2 justify-center"
             >
               <TrendingUp className="h-5 w-5" />
-              Try Sample Analysis
+              试试样例分析
             </motion.h2>
             <p className="text-sm text-white/70 mt-1">
-              Loading trending markets...
+              加载热门市场中...
             </p>
           </div>
 

@@ -4,11 +4,7 @@ import { evidenceLogLR, TYPE_CAPS } from '../forecasting/evidence';
 import { clamp } from '../forecasting/math';
 import { generateObject } from 'ai';
 import { z } from 'zod';
-import { openai } from '@ai-sdk/openai';
-
-// Model helpers
-const getModel = () => openai('gpt-4o');
-const getModelSmall = () => openai('gpt-4o-mini');
+import { getModel, getModelSmall } from '@/lib/ai/model';
 
 export interface MarketSnapshot { 
   probability: number; 
@@ -51,7 +47,8 @@ async function analyzeTopicRelevance(evidence: Evidence[], question: string): Pr
     const { object } = await generateObject({
       model: getModelSmall(),
       schema: RelevanceSchema,
-      system: `You are a relevance analyzer. Determine if evidence items are directly relevant to the prediction question.
+      mode: 'json',
+      system: `You are a relevance analyzer. Determine if evidence items are directly relevant to the prediction question. Always respond with valid JSON.
 
 RELEVANCE CRITERIA:
 - Evidence must be about the SAME subject/entity as the question
@@ -106,7 +103,7 @@ const NicheSchema = z.object({
 
 async function analyzeNicheAuthority(evidence: Evidence[], question: string): Promise<Record<string, number>> {
   if (evidence.length === 0) return {};
-  const model = openai('gpt-5');
+  const model = getModel();
   try {
     const list = evidence.map(e => {
       const domain = e.urls && e.urls.length ? (() => { try { return new URL(e.urls[0]).hostname.replace(/^www\./,''); } catch { return 'unknown'; } })() : 'unknown';
@@ -116,7 +113,8 @@ async function analyzeNicheAuthority(evidence: Evidence[], question: string): Pr
     const { object } = await generateObject({
       model,
       schema: NicheSchema,
-      system: `You are a domain-savvy assessor. For each evidence item, rate whether the SOURCE appears to be a credible niche/specialist outlet for the TOPIC, not just mainstream brand reputation. Return authority in [0,1].`,
+      mode: 'json',
+      system: `You are a domain-savvy assessor. For each evidence item, rate whether the SOURCE appears to be a credible niche/specialist outlet for the TOPIC, not just mainstream brand reputation. Return authority in [0,1]. Always respond with valid JSON.`,
       prompt: `Question: "${question}"
 
 Assess niche credibility for each evidence source listed. Consider:

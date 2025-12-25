@@ -57,12 +57,12 @@ export default function HeroSection({ onAnalyze, isAnalyzing, onShowHowItWorks, 
     setError("");
 
     if (!url) {
-      setError("Please enter a Polymarket or Kalshi URL");
+      setError("请输入 Polymarket 或 Kalshi 链接");
       return;
     }
 
     if (!validateMarketUrl(url)) {
-      setError("Please enter a valid Polymarket or Kalshi market URL");
+      setError("请输入有效的 Polymarket 或 Kalshi 市场链接");
       return;
     }
 
@@ -86,6 +86,21 @@ export default function HeroSection({ onAnalyze, isAnalyzing, onShowHowItWorks, 
 
   return (
     <section className="relative flex-shrink-0 flex items-center justify-center px-4 pt-24 md:pt-32 md:pb-6">
+      {/* 背景视频 */}
+      <div className="fixed inset-0 w-full h-full -z-10 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/Prisma.mp4" type="video/mp4" />
+        </video>
+        {/* 深色遮罩层 */}
+        <div className="absolute inset-0 bg-black/50"></div>
+      </div>
+
       <div className="container max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -101,7 +116,7 @@ export default function HeroSection({ onAnalyze, isAnalyzing, onShowHowItWorks, 
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight font-[family-name:var(--font-space)]"
             >
               <span className="text-white drop-shadow-lg">
-                See the future.
+                洞见未来
               </span>
             </motion.h1>
 
@@ -113,9 +128,9 @@ export default function HeroSection({ onAnalyze, isAnalyzing, onShowHowItWorks, 
             >
               <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-2xl border border-white/30 max-w-2xl">
                 <p className="text-lg md:text-xl text-white/90 leading-relaxed text-center">
-                  In hindsight, we all would&apos;ve bought Bitcoin. 
+                  事后看来，我们都会买比特币。
                   <br className="hidden sm:block" />
-                  Seer into the future, so you can retire off the next one.
+                  预见未来，让你不再错过下一个机会。
                 </p>
               </div>
             </motion.div>
@@ -137,7 +152,7 @@ export default function HeroSection({ onAnalyze, isAnalyzing, onShowHowItWorks, 
               >
                 <Input
                   type="url"
-                  placeholder="Paste Polymarket or Kalshi URL... Or click one of the trending markets below 👇"
+                  placeholder="粘贴 Polymarket 或 Kalshi 链接... 或点击下方热门市场 👇"
                   value={url}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   className={`h-12 md:h-14 text-base px-4 md:px-6 bg-white/95 backdrop-blur-sm border-white/20 focus:bg-white focus:border-white/40 placeholder:text-neutral-500 w-full ${
@@ -204,7 +219,7 @@ export default function HeroSection({ onAnalyze, isAnalyzing, onShowHowItWorks, 
               className="flex justify-center mt-4"
             >
               <div className="relative flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/30">
-                <span className="text-sm text-white/80 font-medium">Powered by</span>
+                <span className="text-sm text-white/80 font-medium">技术支持</span>
                 <a
                   href="https://valyu.network"
                   target="_blank"

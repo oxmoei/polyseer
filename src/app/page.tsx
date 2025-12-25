@@ -14,8 +14,8 @@ import { AuthModal } from "@/components/auth-modal";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [contentVisible, setContentVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 默认不显示加载屏幕
+  const [contentVisible, setContentVisible] = useState(true); // 默认显示内容
   const [marketUrl, setMarketUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResult, setShowResult] = useState(false);
@@ -40,13 +40,7 @@ export default function Home() {
   }, [user]);
 
   const handleAnalyze = async (url: string) => {
-    // Check if user is authenticated
-    if (!user) {
-      setAuthModalOpen(true);
-      return;
-    }
-    
-    // Navigate to analysis page with URL
+    // 简化版本 - 无需登录即可使用
     router.push(`/analysis?url=${encodeURIComponent(url)}`);
   };
 
@@ -58,18 +52,7 @@ export default function Home() {
     }, 100);
   };
 
-  // Skip loading screen on auth redirect or if already initialized
-  useEffect(() => {
-    // Check if we're coming from auth callback
-    const urlParams = new URLSearchParams(window.location.search);
-    const fromAuth = urlParams.get('from_auth');
-
-    if (fromAuth || (initialized && user)) {
-      // Skip loading screen if coming from auth or already logged in
-      setIsLoading(false);
-      setContentVisible(true);
-    }
-  }, [initialized, user]);
+  // 不再需要加载屏幕逻辑 - 直接显示内容
 
   return (
     <>

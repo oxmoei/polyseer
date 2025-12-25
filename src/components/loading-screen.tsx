@@ -1,13 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-
-const UnicornScene = dynamic(
-  () => import("@/components/ui/unicorn-scene").then((mod) => mod.default),
-  { ssr: false }
-);
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -15,25 +9,23 @@ interface LoadingScreenProps {
 
 export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [phase, setPhase] = useState<"intro" | "reveal" | "exit">("intro");
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    
+    // 缩短加载时间：原来 3.5 秒 -> 现在 1.8 秒
     // Phase 2: Reveal phase
     const timer2 = setTimeout(() => {
       setPhase("reveal");
-    }, 1500);
+    }, 600);
 
     // Phase 3: Exit phase
     const timer3 = setTimeout(() => {
       setPhase("exit");
-    }, 2800);
+    }, 1200);
 
     // Complete and remove loading screen
     const timer4 = setTimeout(() => {
       onComplete();
-    }, 3500);
+    }, 1800);
 
     return () => {
       clearTimeout(timer2);
@@ -51,9 +43,13 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden"
         >
-          {/* UnicornStudio background */}
-          <div className="absolute inset-0">
-            {mounted && <UnicornScene />}
+          {/* 简化的渐变背景 - 替代 UnicornStudio */}
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-800 to-black">
+            {/* 简单的动态光效 */}
+            <div className="absolute inset-0 opacity-30">
+              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-500" />
+            </div>
           </div>
 
           {/* Logo text */}
@@ -105,7 +101,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-center mt-4 text-white/60 text-sm md:text-base tracking-wider"
               >
-                See the future
+                洞见未来
               </motion.p>
             </motion.div>
 

@@ -1,12 +1,8 @@
 import { generateText, Output } from 'ai';
-import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { Evidence } from '../forecasting/types';
-import { valyuDeepSearchTool, valyuWebSearchTool } from '../tools/valyu_search';
-
-// Model helpers - using OpenAI directly (costs handled via Valyu OAuth proxy for search)
-const getModelSmall = () => openai('gpt-4o-mini');
-const getModel = () => openai('gpt-4o');
+import { simpleDeepSearchTool, simpleWebSearchTool } from '../tools/simple_search';
+import { getModel, getModelSmall } from '@/lib/ai/model';
 
 interface MarketData {
   market_facts: {
@@ -314,8 +310,8 @@ async function conductResearch(
 - Don't add 'site:' prefixes to queries - use natural language`,
       prompt: `${prompt}\n\nUse the search tools to find relevant information, then summarize your findings. STAY ON TOPIC.`,
       tools: {
-        valyuDeepSearch: valyuDeepSearchTool,
-        valyuWebSearch: valyuWebSearchTool,
+        valyuDeepSearch: simpleDeepSearchTool,
+        valyuWebSearch: simpleWebSearchTool,
       }
     });
 
@@ -494,8 +490,8 @@ Return 3-6 total items across seeds.`;
       system: 'You are an expert adjacent-signal researcher. Focus on recent, high-impact catalysts with clear linkage.',
       prompt: `${prompt}\n\nUse the search tools to find relevant information, then summarize your findings.`,
       tools: {
-        valyuDeepSearch: valyuDeepSearchTool,
-        valyuWebSearch: valyuWebSearchTool,
+        valyuDeepSearch: simpleDeepSearchTool,
+        valyuWebSearch: simpleWebSearchTool,
       }
     });
 
@@ -600,8 +596,8 @@ After searching, return 1-3 high-quality evidence items that directly address th
       system: 'You are an expert researcher conducting targeted searches to fill specific analytical gaps.',
       prompt: `${prompt}\n\nUse the search tools to find relevant information, then summarize your findings.`,
       tools: {
-        valyuDeepSearch: valyuDeepSearchTool,
-        valyuWebSearch: valyuWebSearchTool,
+        valyuDeepSearch: simpleDeepSearchTool,
+        valyuWebSearch: simpleWebSearchTool,
       }
     });
 

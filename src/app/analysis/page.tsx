@@ -10,7 +10,6 @@ import { ChevronDown, ChevronRight, ExternalLink, CheckCircle, Clock, AlertCircl
 import Image from "next/image";
 import { ForecastCard } from "@/lib/forecasting/types";
 import { useAuthStore } from "@/lib/stores/use-auth-store";
-import { getValidAccessToken } from "@/lib/valyu-oauth";
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
 
@@ -35,25 +34,25 @@ interface AnalysisStep {
 }
 
 const STEP_CONFIG: Record<string, { name: string; description: string }> = {
-  fetch_initial: { name: 'Data Collection', description: 'Fetching market data' },
-  initial_data: { name: 'Market Analysis', description: 'Analyzing market fundamentals' },
-  optimize_parameters: { name: 'Parameter Optimization', description: 'Optimizing analysis parameters' },
-  parameters_optimized: { name: 'Configuration Complete', description: 'Analysis configuration optimized' },
-  fetch_complete_data: { name: 'Enhanced Data Fetch', description: 'Retrieving complete dataset' },
-  complete_data_ready: { name: 'Data Processing', description: 'Processing complete market dataset' },
-  planning: { name: 'Research Planning', description: 'Planning research strategy' },
-  plan_complete: { name: 'Strategy Complete', description: 'Research strategy finalized' },
-  researching: { name: 'Initial Research', description: 'Starting initial evidence research' },
-  initial_research_complete: { name: 'Research Cycle 1', description: 'Initial evidence collection finished' },
-  criticism: { name: 'Critical Analysis', description: 'Running critical analysis to identify gaps' },
-  criticism_complete: { name: 'Gap Analysis', description: 'Critical analysis and gap identification complete' },
-  followup_research: { name: 'Follow-up Research', description: 'Conducting targeted follow-up research' },
-  followup_research_complete: { name: 'Research Cycle 2', description: 'Follow-up research completed' },
-  followup_research_skipped: { name: 'Follow-up Skipped', description: 'Follow-up research skipped - no gaps identified' },
-  aggregating: { name: 'Enhanced Analysis', description: 'Aggregating evidence with critic feedback' },
-  aggregation_complete: { name: 'Probability Complete', description: 'Enhanced probability aggregation finished' },
-  reporting: { name: 'Report Generation', description: 'Generating final report' },
-  report_complete: { name: 'Analysis Finished', description: 'Final report generated' }
+  fetch_initial: { name: '数据收集', description: '获取市场数据' },
+  initial_data: { name: '市场分析', description: '分析市场基本面' },
+  optimize_parameters: { name: '参数优化', description: '优化分析参数' },
+  parameters_optimized: { name: '配置完成', description: '分析配置已优化' },
+  fetch_complete_data: { name: '增强数据获取', description: '检测平台并获取市场数据...' },
+  complete_data_ready: { name: '数据处理', description: '处理完整市场数据集' },
+  planning: { name: '研究规划', description: '规划研究策略' },
+  plan_complete: { name: '策略完成', description: '研究策略已确定' },
+  researching: { name: '初始研究', description: '开始初始证据研究' },
+  initial_research_complete: { name: '研究周期 1', description: '初始证据收集完成' },
+  criticism: { name: '批判性分析', description: '进行批判性分析以识别不足' },
+  criticism_complete: { name: '差距分析', description: '批判性分析和差距识别完成' },
+  followup_research: { name: '后续研究', description: '进行针对性后续研究' },
+  followup_research_complete: { name: '研究周期 2', description: '后续研究已完成' },
+  followup_research_skipped: { name: '跳过后续', description: '后续研究已跳过 - 未发现差距' },
+  aggregating: { name: '增强分析', description: '结合批评反馈汇总证据' },
+  aggregation_complete: { name: '概率完成', description: '增强概率聚合完成' },
+  reporting: { name: '报告生成', description: '生成最终报告' },
+  report_complete: { name: '分析完成', description: '最终报告已生成' }
 };
 
 function AnalysisContent() {
@@ -127,7 +126,7 @@ function AnalysisContent() {
         const question = data.market_question
           || forecastCard?.question
           || forecastCard?.response?.question
-          || 'Historical Analysis';
+          || '历史分析';
         const pNeutral = data.p_neutral
           || forecastCard?.pNeutral
           || forecastCard?.response?.finalProbabilities?.pNeutral
@@ -188,8 +187,8 @@ function AnalysisContent() {
         if (data.analysis_steps && Array.isArray(data.analysis_steps)) {
           const historicalSteps: AnalysisStep[] = data.analysis_steps.map((step: any, index: number) => ({
             id: step.step || `step_${index}`,
-            name: STEP_CONFIG[step.step]?.name || step.step || `Step ${index + 1}`,
-            message: step.message || STEP_CONFIG[step.step]?.description || 'Processing...',
+            name: STEP_CONFIG[step.step]?.name || step.step || `步骤 ${index + 1}`,
+            message: step.message || STEP_CONFIG[step.step]?.description || '处理中...',
             status: 'complete' as const,
             details: step.details,
             timestamp: step.timestamp,
@@ -200,11 +199,11 @@ function AnalysisContent() {
 
         setIsComplete(true);
       } else {
-        setError('Failed to load historical analysis');
+        setError('加载历史分析失败');
       }
     } catch (err) {
       console.error('Error fetching historical analysis:', err);
-      setError('Failed to load historical analysis');
+      setError('加载历史分析失败');
     } finally {
       setIsLoadingHistory(false);
     }
@@ -217,7 +216,7 @@ function AnalysisContent() {
     const platform = detectPlatform(url);
 
     if (!identifier) {
-      setError(`Invalid ${platform} URL`);
+      setError(`无效的 ${platform} URL`);
       return;
     }
 
@@ -232,19 +231,7 @@ function AnalysisContent() {
       });
     }
 
-    // User must be authenticated with Valyu
-    if (!user) {
-      setError('VALYU_SIGNIN_REQUIRED');
-      return;
-    }
-
-    // Get Valyu access token for API calls - required
-    const valyuAccessToken = await getValidAccessToken();
-    if (!valyuAccessToken) {
-      setError('VALYU_SIGNIN_REQUIRED');
-      return;
-    }
-
+    // 简化版本 - 无需认证
     fetch('/api/forecast', {
       method: 'POST',
       headers: {
@@ -252,7 +239,6 @@ function AnalysisContent() {
       },
       body: JSON.stringify({
         marketUrl: url,
-        valyuAccessToken,
       }),
     })
     .then(async response => {
@@ -281,7 +267,7 @@ function AnalysisContent() {
       
       const reader = response.body?.getReader();
       if (!reader) {
-        throw new Error('No response body');
+        throw new Error('无响应内容');
       }
 
       const decoder = new TextDecoder();
@@ -314,21 +300,21 @@ function AnalysisContent() {
     })
     .catch(err => {
       console.error('Analysis failed:', err);
-      setError(err.message || 'Analysis failed');
+      setError(err.message || '分析失败');
     });
-  }, [url, extractIdentifier, detectPlatform, user]);
+  }, [url, extractIdentifier, detectPlatform]);
 
   const handleProgressEvent = useCallback((event: ProgressEvent) => {
     console.log('Progress event:', event);
 
     if (event.type === 'error') {
-      setError(event.error || 'Unknown error occurred');
+      setError(event.error || '发生未知错误');
       
       // Track analysis errors
       if (typeof window !== 'undefined') {
         import('@vercel/analytics').then(({ track }) => {
           track('Analysis Error', {
-            error: event.error || 'Unknown error',
+            error: event.error || '未知错误',
             url: url,
           });
         });
@@ -454,7 +440,7 @@ function AnalysisContent() {
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full mx-auto mb-4"
           />
-          <p className="text-white/70">Loading...</p>
+          <p className="text-white/70">加载中...</p>
         </motion.div>
       </div>
     );
@@ -478,10 +464,10 @@ function AnalysisContent() {
             className="text-center max-w-lg mx-4"
           >
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
-              <h1 className="text-2xl font-bold text-white mb-3">Sign in Required</h1>
-              <p className="text-white/80 mb-6">Please sign in to view your analysis history.</p>
+              <h1 className="text-2xl font-bold text-white mb-3">需要登录</h1>
+              <p className="text-white/80 mb-6">请登录以查看您的分析历史。</p>
               <Button onClick={() => router.push('/')} className="w-full bg-white hover:bg-gray-100 text-black font-semibold py-4 rounded-xl">
-                Go to Home
+                返回首页
               </Button>
             </div>
           </motion.div>
@@ -505,7 +491,7 @@ function AnalysisContent() {
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full mx-auto mb-4"
           />
-          <p className="text-white/70">Loading historical analysis...</p>
+          <p className="text-white/70">加载历史分析...</p>
         </motion.div>
       </div>
     );
@@ -522,10 +508,10 @@ function AnalysisContent() {
           className="text-center max-w-md"
         >
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">Analysis Not Found</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">未找到分析</h1>
           <p className="text-red-400 mb-4">{error}</p>
           <Button onClick={() => router.push('/')} variant="outline">
-            Back to Home
+            返回首页
           </Button>
         </motion.div>
       </div>
@@ -570,20 +556,20 @@ function AnalysisContent() {
               {/* Main Card */}
               <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
                 <h1 className="text-3xl font-bold text-white mb-3 font-[family-name:var(--font-space)]">
-                  Sign in with Valyu
+                  使用 Valyu 登录
                 </h1>
                 <p className="text-white/80 mb-6 leading-relaxed">
-                  Valyu is the information backbone of Polyseer, giving our AI engine access to real-time data across web, academic, and proprietary sources.
+                  Valyu 是 Polyseer 的信息骨干，为我们的 AI 引擎提供跨网络、学术和专有来源的实时数据访问。
                 </p>
 
                 {/* Free Credits Badge */}
                 <div className="bg-green-500/20 border border-green-400/30 rounded-xl p-4 mb-6">
                   <div className="flex items-center justify-center gap-2 mb-1">
                     <span className="text-2xl">🎁</span>
-                    <span className="text-green-400 font-bold text-lg">$10 Free Credits</span>
+                    <span className="text-green-400 font-bold text-lg">免费 $10 额度</span>
                   </div>
                   <p className="text-white/70 text-sm">
-                    New accounts get $10 in free search credits
+                    新账户获得 $10 免费搜索额度
                   </p>
                 </div>
 
@@ -593,12 +579,12 @@ function AnalysisContent() {
                   size="lg"
                   className="w-full bg-white hover:bg-gray-100 text-black font-semibold py-6 text-lg rounded-xl"
                 >
-                  Sign in with Valyu
+                  使用 Valyu 登录
                 </Button>
 
                 {/* Note about creating account */}
                 <p className="text-white/50 text-sm mt-4">
-                  Don&apos;t have an account? You can create one during sign-in.
+                  没有账户？您可以在登录时创建一个。
                 </p>
               </div>
             </motion.div>
@@ -617,10 +603,10 @@ function AnalysisContent() {
           className="text-center max-w-md"
         >
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">Analysis Failed</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">分析失败</h1>
           <p className="text-red-400 mb-4">{error}</p>
           <Button onClick={() => window.location.reload()} variant="outline">
-            Try Again
+            重试
           </Button>
         </motion.div>
       </div>
@@ -651,7 +637,7 @@ function AnalysisContent() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-white font-[family-name:var(--font-space)]">
-              {isHistoricalView ? 'Historical Analysis' : ''}
+              {isHistoricalView ? '历史分析' : ''}
             </h1>
             {isHistoricalView && (
               <div className="flex gap-3">
@@ -661,14 +647,14 @@ function AnalysisContent() {
                   onClick={() => router.back()}
                   className="border-white/20 bg-white/10 text-white hover:bg-white/20"
                 >
-                  Back
+                  返回
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => router.push('/')}
                   className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
-                  New Analysis
+                  新分析
                 </Button>
               </div>
             )}
@@ -678,20 +664,20 @@ function AnalysisContent() {
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <div className="text-white/60">Started</div>
+                  <div className="text-white/60">开始时间</div>
                   <div className="text-white font-medium">
                     {new Date(historicalAnalysis.started_at).toLocaleString()}
                   </div>
                 </div>
                 <div>
-                  <div className="text-white/60">Completed</div>
+                  <div className="text-white/60">完成时间</div>
                   <div className="text-white font-medium">
                     {new Date(historicalAnalysis.completed_at).toLocaleString()}
                   </div>
                 </div>
                 {historicalAnalysis.valyu_cost && (
                   <div>
-                    <div className="text-white/60">API Cost</div>
+                    <div className="text-white/60">API 成本</div>
                     <div className="text-white font-medium">
                       ${historicalAnalysis.valyu_cost.toFixed(4)}
                     </div>
@@ -713,7 +699,7 @@ function AnalysisContent() {
               <div className="space-y-2">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                    Historical Analysis
+                    历史分析
                   </Badge>
                   {historicalAnalysis && (
                     <span className="text-white/60 text-sm">
@@ -727,7 +713,7 @@ function AnalysisContent() {
                   rel="noopener noreferrer"
                   className="text-white/90 hover:text-white text-sm break-all leading-relaxed hover:underline decoration-white/50 transition-colors"
                 >
-                  {historicalAnalysis?.market_url || 'Loading...'}
+                  {historicalAnalysis?.market_url || '加载中...'}
                 </a>
               </div>
             ) : (
@@ -753,7 +739,7 @@ function AnalysisContent() {
           >
             <Card className="relative z-10 backdrop-blur-md bg-black/70 border-white/30 shadow-2xl overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-2xl text-white mb-2">Analysis Complete</CardTitle>
+                <CardTitle className="text-2xl text-white mb-2">分析完成</CardTitle>
                 <p className="text-white/80">{forecast.question}</p>
                 {historicalAnalysis?.market_url && (
                   <div className="mt-2">
@@ -763,7 +749,7 @@ function AnalysisContent() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-white/80 underline hover:text-white"
                     >
-                      View on {getPlatformFromUrl(historicalAnalysis.market_url)} <ExternalLink className="w-4 h-4" />
+                      在 {getPlatformFromUrl(historicalAnalysis.market_url)} 查看 <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
                 )}
@@ -772,24 +758,24 @@ function AnalysisContent() {
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6 min-w-0">
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-4">Probability Estimates</h3>
+                    <h3 className="text-lg font-semibold text-white mb-4">概率估计</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Neutral Analysis:</span>
+                        <span className="text-white/70">中性分析:</span>
                         <Badge className="bg-blue-400/20 text-blue-400">
                           {(forecast.pNeutral * 100).toFixed(1)}%
                         </Badge>
                       </div>
                       {forecast.pAware && (
                         <div className="flex justify-between items-center">
-                          <span className="text-white/70">Market-Aware:</span>
+                          <span className="text-white/70">市场感知:</span>
                           <Badge className="bg-purple-400/20 text-purple-400">
                             {(forecast.pAware * 100).toFixed(1)}%
                           </Badge>
                         </div>
                       )}
                       <div className="flex justify-between items-center">
-                        <span className="text-white/70">Market Prior:</span>
+                        <span className="text-white/70">市场先验:</span>
                         <Badge className="bg-gray-400/20 text-gray-400">
                           {(forecast.p0 * 100).toFixed(1)}%
                         </Badge>
@@ -798,7 +784,7 @@ function AnalysisContent() {
                   </div>
 
                   <div className="min-w-0">
-                    <h3 className="text-lg font-semibold text-white mb-4">Analysis Drivers</h3>
+                    <h3 className="text-lg font-semibold text-white mb-4">分析驱动因素</h3>
                     <div className="flex flex-wrap gap-2">
                       {forecast.drivers.map((driver, i) => (
                         <Badge
@@ -818,10 +804,10 @@ function AnalysisContent() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                     <div className="text-center sm:text-left">
                       <p className="text-lg font-semibold text-white mb-1">
-                        Recommendation: {forecast.pNeutral > 0.5 ? 'YES' : 'NO'}
+                        建议: {forecast.pNeutral > 0.5 ? '是' : '否'}
                       </p>
                       <p className="text-white/60 text-sm">
-                        Confidence: {(Math.abs(forecast.pNeutral - 0.5) * 200).toFixed(0)}%
+                        置信度: {(Math.abs(forecast.pNeutral - 0.5) * 200).toFixed(0)}%
                       </p>
                     </div>
 
@@ -830,7 +816,7 @@ function AnalysisContent() {
                       className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
                       size="lg"
                     >
-                      Place Bet
+                      前往下注
                       <ExternalLink className="w-4 h-4" />
                     </Button>
                   </div>
@@ -842,7 +828,7 @@ function AnalysisContent() {
             {forecast.markdownReport && (
               <Card className="relative z-10 backdrop-blur-md mt-6 bg-black/70 border-white/30">
                 <CardHeader>
-                  <CardTitle className="text-white">Detailed Report</CardTitle>
+                  <CardTitle className="text-white">详细报告</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="prose prose-invert prose-sm max-w-none bg-black/30 rounded-lg p-4">
@@ -865,7 +851,7 @@ function AnalysisContent() {
 
                   {forecast.provenance && forecast.provenance.length > 0 && (
                     <div className="mt-6">
-                      <h3 className="text-white text-lg font-semibold mb-3">Most Influential Sources</h3>
+                      <h3 className="text-white text-lg font-semibold mb-3">最具影响力的来源</h3>
                       <ol className="space-y-2 text-sm list-decimal list-inside">
                         {Array.from(new Set(forecast.provenance)).map((sourceUrl, idx) => {
                           let label = sourceUrl;
@@ -899,12 +885,12 @@ function AnalysisContent() {
                   {showReasoningSteps ? (
                     <>
                       <ChevronDown className="w-4 h-4 mr-2" />
-                      Hide Reasoning Steps ({steps.length} steps)
+                      隐藏推理步骤 ({steps.length} 步)
                     </>
                   ) : (
                     <>
                       <ChevronRight className="w-4 h-4 mr-2" />
-                      Show Reasoning Steps ({steps.length} steps)
+                      显示推理步骤 ({steps.length} 步)
                     </>
                   )}
                 </Button>
@@ -993,11 +979,11 @@ function AnalysisContent() {
                             <div>
                               {(['initial_data','complete_data_ready'].includes(step.id)) ? (
                                 <div>
-                                  <CardTitle className="text-white text-lg font-semibold">{getPlatformFromUrl(url)} Market</CardTitle>
+                                  <CardTitle className="text-white text-lg font-semibold">{getPlatformFromUrl(url)} 市场</CardTitle>
                                   {url && (
                                     <div className="text-white/80 text-sm mt-1">
                                       <a href={url} target="_blank" rel="noopener noreferrer" className="underline inline-flex items-center gap-1">
-                                        {formatSlugTitle(extractIdentifier(url)) || `View on ${getPlatformFromUrl(url)}`} <ExternalLink className="w-3 h-3" />
+                                        {formatSlugTitle(extractIdentifier(url)) || `在 ${getPlatformFromUrl(url)} 查看`} <ExternalLink className="w-3 h-3" />
                                       </a>
                                     </div>
                                   )}
@@ -1040,7 +1026,7 @@ function AnalysisContent() {
                                   }
                                 `}
                               >
-                                {step.status === 'running' && '●'} {step.status}
+                                {step.status === 'running' && '●'} {step.status === 'complete' ? '完成' : step.status === 'running' ? '进行中' : step.status === 'error' ? '错误' : '等待中'}
                               </Badge>
                             </motion.div>
                             
@@ -1072,43 +1058,43 @@ function AnalysisContent() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-white/80 text-sm">
                                   {typeof step.details.outcomes === 'number' && (
                                     <div>
-                                      <div className="text-white/60">Outcomes</div>
+                                      <div className="text-white/60">结果数</div>
                                       <div className="font-semibold">{step.details.outcomes}</div>
                                     </div>
                                   )}
                                   {step.details.interval && (
                                     <div>
-                                      <div className="text-white/60">Interval</div>
+                                      <div className="text-white/60">时间间隔</div>
                                       <div className="font-semibold">{step.details.interval}</div>
                                     </div>
                                   )}
                                   {typeof step.details.historySeries === 'number' && (
                                     <div>
-                                      <div className="text-white/60">History Series</div>
+                                      <div className="text-white/60">历史序列</div>
                                       <div className="font-semibold">{step.details.historySeries}</div>
                                     </div>
                                   )}
                                   {typeof step.details.volume === 'number' && (
                                     <div>
-                                      <div className="text-white/60">Volume</div>
+                                      <div className="text-white/60">交易量</div>
                                       <div className="font-semibold">{step.details.volume.toLocaleString()}</div>
                                     </div>
                                   )}
                                   {typeof step.details.liquidity === 'number' && (
                                     <div>
-                                      <div className="text-white/60">Liquidity</div>
+                                      <div className="text-white/60">流动性</div>
                                       <div className="font-semibold">{step.details.liquidity.toLocaleString()}</div>
                                     </div>
                                   )}
                                   {step.details.closeTime && (
                                     <div>
-                                      <div className="text-white/60">Close Time</div>
+                                      <div className="text-white/60">截止时间</div>
                                       <div className="font-semibold">{new Date(step.details.closeTime).toLocaleString()}</div>
                                     </div>
                                   )}
                                   {step.details.resolutionSource && (
                                     <div className="col-span-2">
-                                      <div className="text-white/60">Resolution Source</div>
+                                      <div className="text-white/60">结算来源</div>
                                       <div className="font-semibold truncate">{step.details.resolutionSource}</div>
                                     </div>
                                   )}
@@ -1116,12 +1102,12 @@ function AnalysisContent() {
 
                                 {Array.isArray(step.details.pricesNow) && step.details.pricesNow.length > 0 && (
                                   <div className="mt-4">
-                                    <div className="text-white/60 text-sm mb-2">Top of Book</div>
+                                    <div className="text-white/60 text-sm mb-2">订单簿头寸</div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                       {step.details.pricesNow.map((p:any, idx:number) => (
                                         <div key={idx} className="text-white/80 text-sm flex justify-between bg-white/5 rounded p-2">
-                                          <span className="truncate mr-2">{p.outcome || 'Outcome'}</span>
-                                          <span className="font-mono">bid {p.bid ?? '-'} | ask {p.ask ?? '-'} | mid {p.mid ?? '-'}</span>
+                                          <span className="truncate mr-2">{p.outcome || '结果'}</span>
+                                          <span className="font-mono">买 {p.bid ?? '-'} | 卖 {p.ask ?? '-'} | 中 {p.mid ?? '-'}</span>
                                         </div>
                                       ))}
                                     </div>
@@ -1129,15 +1115,15 @@ function AnalysisContent() {
                                 )}
                                 {step.details?.eventSummary?.isMultiCandidate && Array.isArray(step.details.eventSummary.topCandidates) && (
                                   <div className="mt-4">
-                                    <div className="text-white/60 text-sm mb-2">Top Candidates</div>
+                                    <div className="text-white/60 text-sm mb-2">热门候选</div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                       {step.details.eventSummary.topCandidates.map((c:any, idx:number) => (
                                         <div key={idx} className="text-white/80 text-sm bg-white/5 rounded p-2 flex justify-between">
                                           <span className="truncate mr-2">{c.name}</span>
                                           <span className="font-mono">
                                             {c.implied_probability != null ? `${(c.implied_probability*100).toFixed(1)}%` : '-'}
-                                            {typeof c.volume === 'number' ? ` | vol $${c.volume.toLocaleString()}` : ''}
-                                            {typeof c.liquidity === 'number' ? ` | liq $${c.liquidity.toLocaleString()}` : ''}
+                                            {typeof c.volume === 'number' ? ` | 量 $${c.volume.toLocaleString()}` : ''}
+                                            {typeof c.liquidity === 'number' ? ` | 深 $${c.liquidity.toLocaleString()}` : ''}
                                           </span>
                                         </div>
                                       ))}
@@ -1146,10 +1132,10 @@ function AnalysisContent() {
                                 )}
 
                                 {typeof step.details.withBooks !== 'undefined' && (
-                                  <div className="mt-4 text-white/80 text-sm">Order Books: <span className="font-semibold">{String(step.details.withBooks)}</span></div>
+                                  <div className="mt-4 text-white/80 text-sm">订单簿: <span className="font-semibold">{String(step.details.withBooks)}</span></div>
                                 )}
                                 {typeof step.details.withTrades !== 'undefined' && (
-                                  <div className="text-white/80 text-sm">Recent Trades: <span className="font-semibold">{String(step.details.withTrades)}</span></div>
+                                  <div className="text-white/80 text-sm">近期交易: <span className="font-semibold">{String(step.details.withTrades)}</span></div>
                                 )}
                               </CardContent>
                             </motion.div>
@@ -1192,7 +1178,7 @@ function AnalysisContent() {
             >
               <Card className="relative z-10 backdrop-blur-md bg-black/70 border-white/30 shadow-2xl overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-white mb-2">Analysis Complete</CardTitle>
+                  <CardTitle className="text-2xl text-white mb-2">分析完成</CardTitle>
                   <p className="text-white/80">{forecast.question}</p>
                   {url && (
                     <div className="mt-2">
@@ -1202,7 +1188,7 @@ function AnalysisContent() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-white/80 underline hover:text-white"
                       >
-                        View on {getPlatformFromUrl(url)} <ExternalLink className="w-4 h-4" />
+                        在 {getPlatformFromUrl(url)} 查看 <ExternalLink className="w-4 h-4" />
                       </a>
                     </div>
                   )}
@@ -1211,24 +1197,24 @@ function AnalysisContent() {
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-6 min-w-0">
                     <div>
-                      <h3 className="text-lg font-semibold text-white mb-4">Probability Estimates</h3>
+                      <h3 className="text-lg font-semibold text-white mb-4">概率估计</h3>
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-white/70">Neutral Analysis:</span>
+                          <span className="text-white/70">中性分析:</span>
                           <Badge className="bg-blue-400/20 text-blue-400">
                             {(forecast.pNeutral * 100).toFixed(1)}%
                           </Badge>
                         </div>
                         {forecast.pAware && (
                           <div className="flex justify-between items-center">
-                            <span className="text-white/70">Market-Aware:</span>
+                            <span className="text-white/70">市场感知:</span>
                             <Badge className="bg-purple-400/20 text-purple-400">
                               {(forecast.pAware * 100).toFixed(1)}%
                             </Badge>
                           </div>
                         )}
                         <div className="flex justify-between items-center">
-                          <span className="text-white/70">Market Prior:</span>
+                          <span className="text-white/70">市场先验:</span>
                           <Badge className="bg-gray-400/20 text-gray-400">
                             {(forecast.p0 * 100).toFixed(1)}%
                           </Badge>
@@ -1237,7 +1223,7 @@ function AnalysisContent() {
                     </div>
                     
                     <div className="min-w-0">
-                      <h3 className="text-lg font-semibold text-white mb-4">Analysis Drivers</h3>
+                      <h3 className="text-lg font-semibold text-white mb-4">分析驱动因素</h3>
                       <div className="flex flex-wrap gap-2">
                         {forecast.drivers.map((driver, i) => (
                           <Badge 
@@ -1257,10 +1243,10 @@ function AnalysisContent() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                       <div className="text-center sm:text-left">
                         <p className="text-lg font-semibold text-white mb-1">
-                          Recommendation: {forecast.pNeutral > 0.5 ? 'YES' : 'NO'}
+                          建议: {forecast.pNeutral > 0.5 ? '是' : '否'}
                         </p>
                         <p className="text-white/60 text-sm">
-                          Confidence: {(Math.abs(forecast.pNeutral - 0.5) * 200).toFixed(0)}%
+                          置信度: {(Math.abs(forecast.pNeutral - 0.5) * 200).toFixed(0)}%
                         </p>
                       </div>
                       
@@ -1287,7 +1273,7 @@ function AnalysisContent() {
                             className="rounded"
                           />
                         )}
-                        Place Bet
+                        前往下注
                         <ExternalLink className="w-4 h-4" />
                       </Button>
                     </div>
@@ -1298,7 +1284,7 @@ function AnalysisContent() {
               {forecast.markdownReport && (
                 <Card className="relative z-10 backdrop-blur-md mt-6 bg-black/70 border-white/30">
                   <CardHeader>
-                    <CardTitle className="text-white">Detailed Report</CardTitle>
+                    <CardTitle className="text-white">详细报告</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="prose prose-invert prose-sm max-w-none bg-black/30 rounded-lg p-4">
@@ -1321,7 +1307,7 @@ function AnalysisContent() {
 
                     {forecast.provenance && forecast.provenance.length > 0 && (
                       <div className="mt-6">
-                        <h3 className="text-white text-lg font-semibold mb-3">Most Influential Sources</h3>
+                        <h3 className="text-white text-lg font-semibold mb-3">最具影响力的来源</h3>
                         <ol className="space-y-2 text-sm list-decimal list-inside">
                           {Array.from(new Set(forecast.provenance)).map((url, idx) => {
                             let label = url;
@@ -1354,7 +1340,7 @@ function AnalysisContent() {
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full mx-auto mb-4"
             />
-            <p className="text-white/60">Starting analysis...</p>
+            <p className="text-white/60">开始分析...</p>
           </div>
         )}
       </div>

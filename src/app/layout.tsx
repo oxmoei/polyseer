@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { OpenAICodexAnimatedBackground } from "@/components/ui/open-ai-codex-animated-background";
 import Header from "@/components/header";
 import { Providers } from "@/components/providers";
 import { AuthInitializer } from "@/components/auth-initializer";
-import Image from "next/image";
 import { Analytics } from '@vercel/analytics/next';
 import { MigrationBanner } from "@/components/migration-banner";
 
@@ -90,42 +88,52 @@ export default function RootLayout({
         <Providers>
           <AuthInitializer>
             <MigrationBanner />
-            <OpenAICodexAnimatedBackground />
+            {/* 深色背景 */}
+            <div className="fixed inset-0 -z-10 bg-gradient-to-br from-neutral-950 via-neutral-900 to-black" />
             <Header />
             <main className="relative min-h-screen">{children}</main>
             
-            {/* Fixed Footer Elements */}
+            {/* Fixed Footer Elements - Left */}
+            <div className="fixed bottom-0 left-4 z-40 pointer-events-none">
+              <div className="pb-4">
+                <div className="relative pointer-events-auto">
+                  <div className="relative bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                    <span className="text-sm text-white/70">
+                      基于{' '}
+                      <a
+                        href="https://github.com/yorkeccak/Polyseer"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white/90 hover:text-white font-medium transition-colors underline underline-offset-2"
+                      >
+                        GitHub 开源项目
+                      </a>
+                      {' '}开发
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fixed Footer Elements - Right */}
             <div className="fixed bottom-0 right-4 z-40 pointer-events-none">
               <div className="pb-4 flex items-center gap-3">
                 {/* Terms of Service Link */}
                 <div className="relative pointer-events-auto">
-                  <div 
-                    className="absolute -inset-4 rounded-full blur-2xl"
-                    style={{
-                      background: 'radial-gradient(circle, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
-                    }}
-                  ></div>
                   <div className="relative bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    <a 
-                      href="/terms" 
+                    <a
+                      href="/terms"
                       className="text-sm text-white/80 hover:text-white/100 font-medium transition-colors underline underline-offset-2"
                     >
-                      Terms
+                      条款
                     </a>
                   </div>
                 </div>
 
                 {/* Not Financial Advice - Far Right */}
                 <div className="relative pointer-events-auto">
-                  {/* Background blur effect */}
-                  <div 
-                    className="absolute -inset-4 rounded-full blur-2xl"
-                    style={{
-                      background: 'radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 50%, transparent 100%)',
-                    }}
-                  ></div>
                   <div className="relative bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    <span className="text-sm text-white/90 font-medium">Not financial advice</span>
+                    <span className="text-sm text-white/90 font-medium">非投资建议</span>
                   </div>
                 </div>
               </div>
