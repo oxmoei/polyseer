@@ -28,8 +28,12 @@ import {
   Trash2,
   ExternalLink,
   Monitor,
-  LogOut
+  LogOut,
+  Wallet
 } from 'lucide-react';
+import { useWallet } from '@/lib/payment/use-wallet';
+import { PaymentModal } from '@/components/payment-modal';
+import { getRemainingUses } from '@/lib/payment/usage-store';
 
 interface AnalysisSession {
   id: string;
@@ -73,12 +77,22 @@ export default function Header() {
   const [sessions, setSessions] = useState<AnalysisSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark' | 'system'>('light');
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [remainingUses, setRemainingUses] = useState(0);
 
   const pathname = usePathname();
   const router = useRouter();
   const isAnalysisPage = pathname === '/analysis';
   const user = useAuthStore((state) => state.user);
   const signOut = useAuthStore((state) => state.signOut);
+  const { address: walletAddress, connect: connectWallet } = useWallet();
+
+  // 更新剩余次数
+  useEffect(() => {
+    if (walletAddress) {
+      setRemainingUses(getRemainingUses(walletAddress));
+    }
+  }, [walletAddress, paymentModalOpen]);
 
   // User is a Valyu user if they have valyu_sub
   const isValyuUser = !!user?.valyu_sub;
@@ -222,6 +236,25 @@ export default function Header() {
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
+
+            {/* Wallet Button */}
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPaymentModalOpen(true)}
+                className="gap-2 h-8 bg-gradient-to-br from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 border border-white/20 hover:border-white/30 transition-all text-white/90 hover:text-white drop-shadow-md"
+              >
+                <Wallet className="h-4 w-4" />
+                {walletAddress ? (
+                  <span className="text-xs">
+                    {remainingUses} 次
+                  </span>
+                ) : (
+                  <span className="text-xs">连接钱包</span>
+                )}
+              </Button>
+            )}
 
             {/* <ConnectPolymarket /> */}
 
@@ -508,6 +541,17 @@ export default function Header() {
       <AuthModal
         open={authModalOpen}
         onOpenChange={setAuthModalOpen}
+      />
+      <PaymentModal
+        open={paymentModalOpen}
+        onOpenChange={setPaymentModalOpen}
+        walletAddress={walletAddress}
+        onConnectWallet={connectWallet}
+        onPaymentSuccess={() => {
+          if (walletAddress) {
+            setRemainingUses(getRemainingUses(walletAddress));
+          }
+        }}
       />
     </header>
   );
