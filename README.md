@@ -1,86 +1,24 @@
 # Polyseer - 洞见未来
 
-> *事后看来，我们都会买比特币。Polyseer 让你预见未来，不再错过下一个机会。*
+预测市场告诉你可能发生什么，Polyseer 告诉你为什么。
 
-**非投资建议** | Polyseer 仅供娱乐和研究目的，请自行研究判断。
+输入任意 **Polymarket 或 Kalshi** 链接，即可获得结构化分析，解析驱动结果的实际因素。不再依赖直觉或表面判断，而是通过学术论文、新闻、市场数据和专家分析进行系统性研究。
 
----
-
-## 开源优化版本 (v2.0)
-
-本版本基于原版 Polyseer 进行了深度重构和优化，移除了商业化组件，打造纯净的开源体验。
-
-### 本次优化内容
-
-#### 1. 架构精简 - 移除商业化支付系统
-
-原版项目集成了基于 BSC 链的 USDT 支付系统，包含完整的 Web3 钱包连接、链上交易验证、使用次数计费等功能。本次优化完全移除了该付费墙：
-
-**删除的支付相关模块：**
-- `src/components/payment-modal.tsx` - 支付弹窗组件（218 行），包含钱包状态管理、充值地址展示、交易检测逻辑
-- `src/lib/payment/config.ts` - 支付配置（收款地址、最低充值额、USDT/次数兑换比例、BSC 链 ID）
-- `src/lib/payment/usage-store.ts` - 使用次数存储（基于 localStorage 的用量追踪、支付同步、余额计算）
-- `src/lib/payment/use-wallet.ts` - 钱包 Hook（MetaMask 连接、BSC 网络切换、地址状态管理）
-- `src/lib/wagmi-config.ts` - Wagmi 配置（Polygon 链配置、MetaMask 连接器、RPC 端点）
-
-**重构的业务逻辑：**
-- `src/app/page.tsx` - 移除 `canUse()` / `consumeOnce()` 付费检查，用户现可直接进入分析流程
-- `src/components/header.tsx` - 移除钱包连接按钮、剩余次数显示、PaymentModal 集成（约 80 行代码）
-- `src/components/providers.tsx` - 移除 WagmiProvider 包装层，简化 React Context 嵌套结构
-
-#### 2. 依赖瘦身 - 减少 40% 构建体积
-
-移除了与支付系统相关的重量级依赖包：
-
-| 依赖包 | 版本 | 说明 | 影响 |
-|--------|------|------|------|
-| `wagmi` | ^2.16.9 | Web3 React Hooks 库 | 移除约 2.1MB 未压缩代码 |
-| `viem` | ^2.36.0 | TypeScript 以太坊客户端 | 移除约 1.8MB，wagmi 的核心依赖 |
-| `ethers` | ^6.15.0 | 以太坊交互库 | 移除约 1.2MB，用于交易签名验证 |
-| `@vercel/analytics` | ^1.5.0 | Vercel 数据分析 | 移除用户行为追踪，保护隐私 |
-
-**优化效果：**
-- `node_modules` 体积从 ~380MB 降至 ~220MB
-- 首次 `npm install` 时间缩短约 45 秒
-- 客户端 JavaScript 包体积显著减小，提升首屏加载速度
-
-#### 3. 数据追踪清理 - 保护用户隐私
-
-移除了所有 Vercel Analytics 埋点代码，涉及以下用户行为追踪：
-
-**清理的追踪事件：**
-- `src/app/layout.tsx` - 移除全局 `<Analytics />` 组件
-- `src/app/page.tsx` - 移除 "Home Page Visited" 事件追踪
-- `src/app/analysis/page.tsx` - 移除 "Analysis Started"、"Analysis Error"、"Report Completed" 三处事件追踪
-- `src/app/auth/valyu/complete/page.tsx` - 移除 "Sign In Success"、"Sign In Error" 登录追踪
-- `src/components/header.tsx` - 移除 "Sign In Button Clicked" 按钮点击追踪
-
-**隐私改进：**
-- 不再向第三方服务发送用户分析的市场 URL
-- 不再追踪用户的分析结果概率值
-- 不再记录用户登录/登出行为轨迹
-
-#### 4. 代码质量优化
-
-**清理未使用的导入和变量：**
-- 移除 `useEffect` 中的 Analytics 动态导入逻辑
-- 清理 `useWallet` Hook 的所有引用点
-- 移除 `Wallet` 图标的 lucide-react 导入
-
-**简化组件状态：**
-- `page.tsx`: 移除 `paymentModalOpen`、`pendingUrl` 状态变量
-- `header.tsx`: 移除 `paymentModalOpen`、`remainingUses` 状态变量及相关 useEffect
-
----
+系统使用多个 AI 代理对问题的正反两面进行研究，然后使用贝叶斯概率数学聚合证据。相当于拥有一个能在几分钟内阅读数千篇资料并提供关键洞察的研究团队。
 
 ## 快速开始
-
+### 🔴Linux/WSL/macOS 用户（确保你已安装 `git`，如果未安装请参考➡️[安装git教程](./安装git教程.md)）
 ```bash
-git clone https://github.com/your-username/polyseer.git
-cd polyseer
+# 克隆仓库并进入目录
+git clone https://github.com/oxmoei/polyseer.git && cd polyseer
+
+# 根据你当前的系统自动安装缺失的环境依赖
+./install.sh
+
+# 安装项目依赖
 npm install
 
-# 创建 .env.local 配置文件（见下方说明）
+# 创建并配置 .env.local（见下方说明）
 
 npm run dev
 ```
@@ -90,12 +28,6 @@ npm run dev
 ---
 
 ## 什么是 Polyseer？
-
-预测市场告诉你可能发生什么，Polyseer 告诉你为什么。
-
-输入任意 **Polymarket 或 Kalshi** 链接，即可获得结构化分析，解析驱动结果的实际因素。不再依赖直觉或表面判断，而是通过学术论文、新闻、市场数据和专家分析进行系统性研究。
-
-系统使用多个 AI 代理对问题的正反两面进行研究，然后使用贝叶斯概率数学聚合证据。相当于拥有一个能在几分钟内阅读数千篇资料并提供关键洞察的研究团队。
 
 **核心功能：**
 - 跨学术、网络和市场数据源的系统性研究
@@ -308,18 +240,18 @@ graph TD
 - **OpenAI API 密钥** - 用于 GPT 访问
 - **Valyu OAuth 凭证** - 从 [platform.valyu.ai](https://platform.valyu.ai) 获取
 - **Supabase 账户** - 用于数据库和会话管理
+- **支持平台** - Linux / MacOS / WSL
 
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/your-username/polyseer.git
-cd polyseer
+git clone https://github.com/oxmoei/polyseer.git && cd polyseer
 ```
 
-### 2. 安装依赖
+### 2. 自动安装依赖
 
 ```bash
-npm install
+./install && npm install
 ```
 
 ### 3. 环境变量配置
