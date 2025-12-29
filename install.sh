@@ -89,3 +89,45 @@ elif command -v wget &>/dev/null; then
 else
     exit 1
 fi
+
+# 自动 source shell 配置文件
+echo "正在应用环境配置..."
+get_shell_rc() {
+    local current_shell=$(basename "$SHELL")
+    local shell_rc=""
+    
+    case $current_shell in
+        "bash")
+            shell_rc="$HOME/.bashrc"
+            ;;
+        "zsh")
+            shell_rc="$HOME/.zshrc"
+            ;;
+        *)
+            if [ -f "$HOME/.bashrc" ]; then
+                shell_rc="$HOME/.bashrc"
+            elif [ -f "$HOME/.zshrc" ]; then
+                shell_rc="$HOME/.zshrc"
+            elif [ -f "$HOME/.profile" ]; then
+                shell_rc="$HOME/.profile"
+            else
+                shell_rc="$HOME/.bashrc"
+            fi
+            ;;
+    esac
+    echo "$shell_rc"
+}
+
+SHELL_RC=$(get_shell_rc)
+# 检查是否有需要 source 的配置（如 PATH 修改、nvm 等）
+if [ -f "$SHELL_RC" ]; then
+    # 检查是否有常见的配置项需要 source
+    if grep -qE "(export PATH|nvm|\.nvm)" "$SHELL_RC" 2>/dev/null; then
+        echo "检测到环境配置，正在应用环境变量..."
+        source "$SHELL_RC" 2>/dev/null || echo "自动应用失败，请手动运行: source $SHELL_RC"
+    else
+        echo "未检测到需要 source 的配置"
+    fi
+fi
+
+echo "安装完成！"
