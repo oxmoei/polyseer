@@ -242,7 +242,7 @@ graph TD
 - **Supabase 账户** - 用于数据库和会话管理
 - **支持平台** - Linux / MacOS / WSL
 
-### 1. 克隆仓库
+### 1. 克隆仓库（确保你已安装 `git`，如果未安装请参考➡️[安装git教程](./安装git教程.md)）
 
 ```bash
 git clone https://github.com/oxmoei/polyseer.git && cd polyseer
