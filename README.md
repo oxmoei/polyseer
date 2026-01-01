@@ -12,14 +12,13 @@
 # 克隆仓库并进入目录
 git clone https://github.com/oxmoei/polyseer.git && cd polyseer
 
-# 根据你当前的系统自动安装缺失的环境依赖
+# 智能识别你的系统并自动安装缺失的环境依赖
 ./install.sh
 
 # 安装项目依赖
 npm install
 
 # 创建并配置 .env.local（见下方说明）
-
 npm run dev
 ```
 
@@ -251,7 +250,7 @@ git clone https://github.com/oxmoei/polyseer.git && cd polyseer
 ### 2. 自动安装依赖
 
 ```bash
-./install && npm install
+./install.sh && npm install
 ```
 
 ### 3. 环境变量配置
